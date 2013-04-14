@@ -52,6 +52,9 @@ class BrainFuck:
                     dataPointer = stack[len(stack)-1]
             dataPointer += 1;
 
+            if x == '.':
+                self.output = self.output + chr(self.memory[self.memoryPointer])
+
             if dataPointer == dataLength:
                 break
 
