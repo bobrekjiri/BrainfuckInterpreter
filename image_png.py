@@ -15,6 +15,9 @@ class PNGNotImplementedError(Exception):
 class PngReader():
     """Třída pro práci s PNG-obrázky."""
     
+    def byteArrayToNumber(self, array):
+        return (array[0] << 24) + (array[1] << 16) + (array[2] << 8) + array[3]
+    
     def __init__(self, filepath):
         
         with open(filepath, mode='br') as f:
@@ -23,15 +26,17 @@ class PngReader():
                 raise PNGWrongHeaderError()
             while 1:
                 sizeData = f.read(4)
-                chunkSize = (sizeData[0] << 24) + (sizeData[1] << 16) + (sizeData[2] << 8) + sizeData[3]
+                chunkSize = self.byteArrayToNumber(sizeData)
                 print(chunkSize)
                 chunkType = f.read(4)
-                print(chunkType)
                 chunkData = f.read(chunkSize)
-                print(chunkData)
                 chunkCRC = f.read(4)
-                print(chunkCRC)
-                break
+                if chunkType == b'IDAT':
+                    pass
+                elif chunkType == b'IHDR':
+                    pass
+                elif chunkType == b'IEND':
+                    break
         
         
         # RGB-data obrázku jako seznam seznamů řádek,
