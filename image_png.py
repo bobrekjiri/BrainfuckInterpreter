@@ -1,6 +1,8 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import zlib
+
 
 class PNGWrongHeaderError(Exception):
     """Výjimka oznamující, že načítaný soubor zřejmě není PNG-obrázkem."""
@@ -27,10 +29,13 @@ class PngReader():
             while 1:
                 sizeData = f.read(4)
                 chunkSize = self.byteArrayToNumber(sizeData)
-                print(chunkSize)
                 chunkType = f.read(4)
                 chunkData = f.read(chunkSize)
                 chunkCRC = f.read(4)
+                computedCRC = zlib.crc32(chunkType + chunkData)
+                givenCRC = self.byteArrayToNumber(chunkCRC)
+                if computedCRC != givenCRC:
+                    raise PNGNotImplementedError()
                 if chunkType == b'IDAT':
                     pass
                 elif chunkType == b'IHDR':
