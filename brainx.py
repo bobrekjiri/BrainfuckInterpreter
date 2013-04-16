@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 
 class BrainFuck:
     """Interpretr jazyka brainfuck."""
@@ -14,7 +15,7 @@ class BrainFuck:
         
         # inicializace proměnných
         self.memory = bytearray(memory)
-        self.memoryPointer = memory_pointer
+        self.memory_pointer = memory_pointer
         memoryLength = len(self.memory)
         
         # DEBUG a testy
@@ -24,36 +25,43 @@ class BrainFuck:
         while 1:
             x = self.data[dataPointer]
             if x == '+':
-                self.memory[self.memoryPointer] += 1
+                self.memory[self.memory_pointer] += 1
 
             if x == '-':
-                self.memory[self.memoryPointer] -= 1
+                self.memory[self.memory_pointer] -= 1
 
             if x == '>':
-                self.memoryPointer += 1
-                if self.memoryPointer == memoryLength:
+                self.memory_pointer += 1
+                if self.memory_pointer == memoryLength:
                     self.memory.append(0)
                     memoryLength += 1
 
             if x == '<':
-                self.memoryPointer -= 0 if self.memoryPointer == 0 else 1
+                self.memory_pointer -= 0 if self.memory_pointer == 0 else 1
 
             if x == '[':
-                if self.memory[self.memoryPointer] > 0:
+                if self.memory[self.memory_pointer] > 0:
                     stack.append(dataPointer)
                 else:
                     while self.data[dataPointer] != ']':
                         dataPointer += 1
 
             if x == ']':
-                if self.memory[self.memoryPointer] == 0:
+                if self.memory[self.memory_pointer] == 0:
                     stack.pop()
                 else:
                     dataPointer = stack[len(stack)-1]
             dataPointer += 1;
 
             if x == '.':
-                self.output = self.output + chr(self.memory[self.memoryPointer])
+                tmp = chr(self.memory[self.memory_pointer])
+                self.output = self.output + tmp
+                sys.stdout.write(tmp)
+                sys.stdout.flush()
+                
+            if x == ',':
+                tmp = ord(sys.stdin.read(1))
+                self.memory[self.memory_pointer] = tmp % 256
 
             if dataPointer == dataLength:
                 break
