@@ -39,7 +39,10 @@ class PngReader():
                 if chunkType == b'IDAT':
                     pass
                 elif chunkType == b'IHDR':
-                    pass
+                    height = self.byteArrayToNumber(chunkData[0:4])
+                    width = self.byteArrayToNumber(chunkData[4:8])
+                    if chunkData[8:] != b'\x08\x02\x00\x00\x00':
+                        raise PNGNotImplementedError()
                 elif chunkType == b'IEND':
                     break
         
