@@ -33,50 +33,61 @@ class BrainFuck:
         while 1:
             x = self.data[dataPointer]
             if x == '+':
-                self.memory[self.memory_pointer] += 1
+                tmp = self.memory[self.memory_pointer]
+                tmp = (tmp + 1) % 256
+                self.memory[self.memory_pointer] = tmp
 
-            if x == '-':
-                self.memory[self.memory_pointer] -= 1
+            elif x == '-':
+                tmp = self.memory[self.memory_pointer]
+                tmp = (tmp - 1) % 256
+                self.memory[self.memory_pointer] = tmp
 
-            if x == '>':
+            elif x == '>':
                 self.memory_pointer += 1
                 if self.memory_pointer == memoryLength:
                     self.memory.append(0)
                     memoryLength += 1
 
-            if x == '<':
+            elif x == '<':
                 self.memory_pointer -= 0 if self.memory_pointer == 0 else 1
 
-            if x == '[':
+            elif x == '[':
                 if self.memory[self.memory_pointer] > 0:
                     stack.append(dataPointer)
                 else:
-                    while self.data[dataPointer] != ']':
+                    vnoreni = 1
+                    dataPointer += 1
+                    while vnoreni > 0:
+                        if self.data[dataPointer] == ']':
+                            vnoreni -= 1
+                        if self.data[dataPointer] == '[':
+                            vnoreni += 1
                         dataPointer += 1
-
-            if x == ']':
+                        if dataPointer == dataLength:
+                            break
+                    dataPointer -= 1
+            elif x == ']':
                 if self.memory[self.memory_pointer] == 0:
                     stack.pop()
                 else:
                     dataPointer = stack[len(stack)-1]
-            dataPointer += 1;
 
-            if x == '.':
+            elif x == '.':
                 tmp = chr(self.memory[self.memory_pointer])
                 self.output = self.output + tmp
                 sys.stdout.write(tmp)
                 sys.stdout.flush()
                 
-            if x == ',':
+            elif x == ',':
                 if inputPointer == len(inputData):
                     tmp = ord(sys.stdin.read(1))
                 else:
                     tmp = ord(inputData[inputPointer])
                     inputPointer += 1
                 self.memory[self.memory_pointer] = tmp % 256
-                        
-
-            if dataPointer == dataLength:
+            
+            dataPointer += 1;            
+            if dataPointer >= dataLength:
                 break
 
     #
