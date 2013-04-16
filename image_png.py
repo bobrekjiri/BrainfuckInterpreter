@@ -20,7 +20,12 @@ class PngReader():
     def byteArrayToNumber(self, array):
         return (array[0] << 24) + (array[1] << 16) + (array[2] << 8) + array[3]
     
+    def getScanlines(self, data):
+        lines = []
+        return lines
+    
     def __init__(self, filepath):
+        data = bytearray()
         
         with open(filepath, mode='br') as f:
             header = f.read(8)
@@ -37,15 +42,19 @@ class PngReader():
                 if computedCRC != givenCRC:
                     raise PNGNotImplementedError()
                 if chunkType == b'IDAT':
-                    pass
+                    data += chunkData
                 elif chunkType == b'IHDR':
-                    height = self.byteArrayToNumber(chunkData[0:4])
-                    width = self.byteArrayToNumber(chunkData[4:8])
+                    self.height = self.byteArrayToNumber(chunkData[0:4])
+                    self.width = self.byteArrayToNumber(chunkData[4:8])
                     if chunkData[8:] != b'\x08\x02\x00\x00\x00':
                         raise PNGNotImplementedError()
                 elif chunkType == b'IEND':
                     break
-        
+            
+            decompressed = zlib.decompress(data)
+            print(decompressed)
+            lines = self.getScanlines(decompressed)
+            
         
         # RGB-data obrázku jako seznam seznamů řádek,
         #   v každé řádce co pixel, to trojce (R, G, B)
