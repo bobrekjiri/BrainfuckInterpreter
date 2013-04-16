@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import image_png
 
 class BrainFuck:
     """Interpretr jazyka brainfuck."""
@@ -103,10 +104,13 @@ class BrainLoller():
     def __init__(self, filename):
         """Inicializace interpretru brainlolleru."""
         
+        image = image_png.PngReader(filename)
+        
+        
         # self.data obsahuje rozkódovaný zdrojový kód brainfucku..
         self.data = ''
         # ..který pak předhodíme interpretru
-        self.program = BrainFuck(self.data)
+        #self.program = BrainFuck(self.data)
 
 
 class BrainCopter():
