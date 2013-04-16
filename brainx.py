@@ -6,11 +6,19 @@ import sys
 class BrainFuck:
     """Interpretr jazyka brainfuck."""
     
+    def getInput(self, data):
+        tmp = data.split("!")
+        if len(tmp) == 1:
+            return ""
+        return tmp[1]
+    
     def __init__(self, data, memory=b'\x00', memory_pointer=0):
         """Inicializace interpretru brainfucku."""
         stack = list()
         dataPointer = 0
         self.data = data
+        inputData = self.getInput(data)
+        inputPointer = 0
         dataLength = len(self.data)
         
         # inicializace proměnných
@@ -60,8 +68,13 @@ class BrainFuck:
                 sys.stdout.flush()
                 
             if x == ',':
-                tmp = ord(sys.stdin.read(1))
+                if inputPointer == len(inputData):
+                    tmp = ord(sys.stdin.read(1))
+                else:
+                    tmp = ord(inputData[inputPointer])
+                    inputPointer += 1
                 self.memory[self.memory_pointer] = tmp % 256
+                        
 
             if dataPointer == dataLength:
                 break
