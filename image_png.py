@@ -26,7 +26,7 @@ class PngReader():
             linedata = []
             base = i*((self.width * 3) + 1)
             for j in range(self.width):
-                offset = j * self.width
+                offset = j * 3
                 rgb = (data[base + offset + 1], data[base + offset + 2], data[base + offset + 3])
                 linedata.append(rgb)
             lines.append((data[base], linedata))
@@ -40,7 +40,7 @@ class PngReader():
             print(linefilter)
             print(linedata)
             if   linefilter == 0:
-                pass
+                output.append(linedata)
             elif linefilter == 1:
                 pass
             elif linefilter == 2:
@@ -71,21 +71,20 @@ class PngReader():
                 if   chunkType == b'IDAT':
                     data += chunkData
                 elif chunkType == b'IHDR':
-                    self.height = self.byteArrayToNumber(chunkData[0:4])
-                    self.width  = self.byteArrayToNumber(chunkData[4:8])
+                    self.width  = self.byteArrayToNumber(chunkData[0:4])
+                    self.height = self.byteArrayToNumber(chunkData[4:8])
                     if chunkData[8:] != b'\x08\x02\x00\x00\x00':
                         raise PNGNotImplementedError()
                 elif chunkType == b'IEND':
                     break
             
         decompressed = zlib.decompress(data)
-        print(decompressed)
         lines = self.getScanlines(decompressed)
-        print(lines)
             
         # RGB-data obrázku jako seznam seznamů řádek,
         #   v každé řádce co pixel, to trojce (R, G, B)
         self.rgb = self.decode(lines)
+        #print(self.rgb)
         
         
         
