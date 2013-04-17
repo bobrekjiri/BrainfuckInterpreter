@@ -101,16 +101,71 @@ class BrainFuck:
 class BrainLoller():
     """Třída pro zpracování jazyka brainloller."""
 
+    def move(self, x, y, direction):
+        if   direction == 0:
+            x += 1
+            if x ==  self.width:
+                return None, None
+            return x, y
+        elif direction == 1:
+            y += 1
+            if y == self.height:
+                return None, None
+            return x, y
+        elif direction == 2:
+            x -= 1
+            if x == -1:
+                return None, None
+            return x, y
+        else:
+            y -= 1
+            if y == -1:
+                return None, None
+            return x, y
+
     def __init__(self, filename):
         """Inicializace interpretru brainlolleru."""
-
-        image = image_png.PngReader(filename)
-
-        # self.data obsahuje rozkódovaný zdrojový kód brainfucku..
         self.data = ''
-        # ..který pak předhodíme interpretru
-        #self.program = BrainFuck(self.data)
+        image = image_png.PngReader(filename)
+        self.width = image.width
+        self.height = image.height
+        x = 0
+        y = 0
+        direction = 0
+        while 1:
+            cell = image.rgb[y][x]
+            if   cell[0] == 255:
+                if   cell[1] == 255:
+                    self.data += '['
+                elif cell[1] ==   0:
+                    self.data += '>'
+            elif cell[0] == 128:
+                if   cell[1] == 128:
+                    self.data += ']'
+                elif cell[1] ==   0:
+                    self.data += '<'
+            elif cell[0] ==   0:
+                if   cell[1] == 255:
+                    if   cell[2] == 255:
+                        direction = (direction + 1) % 4
+                    elif cell[2] ==   0:
+                        self.data += '+'
+                elif cell[1] == 128:
+                    if   cell[2] == 128:
+                        direction = 3 if direction == 0 else direction - 1
+                    elif cell[2] ==   0:
+                        self.data += '-'
+                elif cell[1] ==   0:
+                    if   cell[2] == 255:
+                        self.data += '.'
+                    elif cell[2] == 128:
+                        self.data += ','
 
+            x, y = self.move(x, y, direction)
+            if x == None:
+                break
+        print(self.data)
+        self.program = BrainFuck(self.data)
 
 class BrainCopter():
     """Třída pro zpracování jazyka braincopter."""
