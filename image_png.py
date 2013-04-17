@@ -16,10 +16,22 @@ class PNGNotImplementedError(Exception):
 
 class PngReader():
     """Třída pro práci s PNG-obrázky."""
-    
+
     def byteArrayToNumber(self, array):
         return (array[0] << 24) + (array[1] << 16) + (array[2] << 8) + array[3]
-    
+
+    def paeth(self, a, b, c):
+        p = a + b - c
+        pa = abs(p - a)
+        pb = abs(p - b)
+        pc = abs(p - c)
+        if pa <= pb and pa <= pc:
+            return a
+        elif pb <= pc:
+            return b
+        else:
+            return c
+
     def getScanlines(self, data):
         lines = []
         for i in range(self.height):
@@ -31,14 +43,12 @@ class PngReader():
                 linedata.append(rgb)
             lines.append((data[base], linedata))
         return lines
-        
+
     def decode(self, lines):
         output = []
         for i in range(self.height):
             linefilter = lines[i][0]
             linedata   = lines[i][1]
-            print(linefilter)
-            print(linedata)
             if   linefilter == 0:
                 output.append(linedata)
             elif linefilter == 1:
@@ -61,7 +71,6 @@ class PngReader():
                         b = (linedata[j][2] + output[i-1][j][2]) % 256
                         newlinedata.append((r, g, b))
                     output.append(newlinedata)
-                    print(newlinedata)
             elif linefilter == 3:
                 newlinedata = []
                 for j in range(0,len(linedata)):
@@ -72,14 +81,32 @@ class PngReader():
                     g = (linedata[j][1] + fg) % 256
                     b = (linedata[j][2] + fb) % 256
                     newlinedata.append((r, g, b))
-                output.append(newlinedata)               
+                output.append(newlinedata)
             elif linefilter == 4:
-                pass
+                newlinedata = []
+                for j in range(0,len(linedata)):
+                    ra = 0 if           j == 0  else newlinedata[j-1][0]
+                    rb = 0 if i == 0            else output[i-1][j  ][0]
+                    rc = 0 if i == 0 or j == 0  else output[i-1][j-1][0]
+
+                    ga = 0 if           j == 0  else newlinedata[j-1][1]
+                    gb = 0 if i == 0            else output[i-1][j  ][1]
+                    gc = 0 if i == 0 or j == 0  else output[i-1][j-1][1]
+
+                    ba = 0 if           j == 0  else newlinedata[j-1][2]
+                    bb = 0 if i == 0            else output[i-1][j  ][2]
+                    bc = 0 if i == 0 or j == 0  else output[i-1][j-1][2]
+
+                    r = (linedata[j][0] + self.paeth(ra, rb, rc)) % 256
+                    g = (linedata[j][1] + self.paeth(ga, gb, gc)) % 256
+                    b = (linedata[j][2] + self.paeth(ba, bb, bc)) % 256
+                    newlinedata.append((r, g, b))
+                output.append(newlinedata)
         return output
-    
+
     def __init__(self, filepath):
         data = bytearray()
-        
+
         with open(filepath, mode='br') as f:
             header = f.read(8)
             if header != b'\x89PNG\r\n\x1a\n':
@@ -103,19 +130,10 @@ class PngReader():
                         raise PNGNotImplementedError()
                 elif chunkType == b'IEND':
                     break
-            
+
         decompressed = zlib.decompress(data)
         lines = self.getScanlines(decompressed)
-            
+
         # RGB-data obrázku jako seznam seznamů řádek,
         #   v každé řádce co pixel, to trojce (R, G, B)
         self.rgb = self.decode(lines)
-        #print(self.rgb)
-        
-        
-        
-        
-        
-        
-        
-        
