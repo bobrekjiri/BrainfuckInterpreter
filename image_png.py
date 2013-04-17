@@ -22,7 +22,20 @@ class PngReader():
     
     def getScanlines(self, data):
         lines = []
+        print(len(data))
+        for i in range(0, self.height):
+            line = []
+            base = i*((self.width * 3) + 1)
+            line.append(data[base])
+            for j in range(0, self.width):
+                offset = j * self.width
+                rgb = (data[base + offset + 1], data[base + offset + 2], data[base + offset + 3])
+                line.append(rgb)
+            lines.append(line)
         return lines
+        
+    def decode(self, lines):
+        return []
     
     def __init__(self, filepath):
         data = bytearray()
@@ -51,14 +64,14 @@ class PngReader():
                 elif chunkType == b'IEND':
                     break
             
-            decompressed = zlib.decompress(data)
-            print(decompressed)
-            lines = self.getScanlines(decompressed)
+        decompressed = zlib.decompress(data)
+        print(decompressed)
+        lines = self.getScanlines(decompressed)
+        print(lines)
             
-        
         # RGB-data obrázku jako seznam seznamů řádek,
         #   v každé řádce co pixel, to trojce (R, G, B)
-        self.rgb = []
+        self.rgb = self.decode(lines)
         
         
         
