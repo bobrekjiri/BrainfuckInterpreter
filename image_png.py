@@ -51,7 +51,17 @@ class PngReader():
                     newlinedata.append((r, g, b))
                 output.append(newlinedata)
             elif linefilter == 2:
-                pass
+                if i == 0:
+                    output.append(linedata)
+                else:
+                    newlinedata = []
+                    for j in range(0,len(linedata)):
+                        r = (linedata[j][0] + output[i-1][j][0]) % 256
+                        g = (linedata[j][1] + output[i-1][j][1]) % 256
+                        b = (linedata[j][2] + output[i-1][j][2]) % 256
+                        newlinedata.append((r, g, b))
+                    output.append(newlinedata)
+                    print(newlinedata)
             elif linefilter == 3:
                 pass
             elif linefilter == 4:
