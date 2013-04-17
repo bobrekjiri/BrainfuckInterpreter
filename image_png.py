@@ -22,20 +22,34 @@ class PngReader():
     
     def getScanlines(self, data):
         lines = []
-        print(len(data))
-        for i in range(0, self.height):
-            line = []
+        for i in range(self.height):
+            linedata = []
             base = i*((self.width * 3) + 1)
-            line.append(data[base])
-            for j in range(0, self.width):
+            for j in range(self.width):
                 offset = j * self.width
                 rgb = (data[base + offset + 1], data[base + offset + 2], data[base + offset + 3])
-                line.append(rgb)
-            lines.append(line)
+                linedata.append(rgb)
+            lines.append((data[base], linedata))
         return lines
         
     def decode(self, lines):
-        return []
+        output = []
+        for i in range(self.height):
+            linefilter = lines[i][0]
+            linedata   = lines[i][1]
+            print(linefilter)
+            print(linedata)
+            if   linefilter == 0:
+                pass
+            elif linefilter == 1:
+                pass
+            elif linefilter == 2:
+                pass
+            elif linefilter == 3:
+                pass
+            elif linefilter == 4:
+                pass
+        return output
     
     def __init__(self, filepath):
         data = bytearray()
@@ -45,20 +59,20 @@ class PngReader():
             if header != b'\x89PNG\r\n\x1a\n':
                 raise PNGWrongHeaderError()
             while 1:
-                sizeData = f.read(4)
+                sizeData  = f.read(4)
                 chunkSize = self.byteArrayToNumber(sizeData)
                 chunkType = f.read(4)
                 chunkData = f.read(chunkSize)
-                chunkCRC = f.read(4)
+                chunkCRC  = f.read(4)
                 computedCRC = zlib.crc32(chunkType + chunkData)
-                givenCRC = self.byteArrayToNumber(chunkCRC)
+                givenCRC  = self.byteArrayToNumber(chunkCRC)
                 if computedCRC != givenCRC:
                     raise PNGNotImplementedError()
-                if chunkType == b'IDAT':
+                if   chunkType == b'IDAT':
                     data += chunkData
                 elif chunkType == b'IHDR':
                     self.height = self.byteArrayToNumber(chunkData[0:4])
-                    self.width = self.byteArrayToNumber(chunkData[4:8])
+                    self.width  = self.byteArrayToNumber(chunkData[4:8])
                     if chunkData[8:] != b'\x08\x02\x00\x00\x00':
                         raise PNGNotImplementedError()
                 elif chunkType == b'IEND':
