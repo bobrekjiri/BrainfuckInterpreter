@@ -195,10 +195,8 @@ class BrainCopter():
     def __init__(self, filename):
         """Inicializace interpretru braincopteru."""
 
-        self.data = ''
-        print("Decoding image...", end=' ')
+        self.commands = []
         image = image_png.PngReader(filename)
-        print("Done\nInterpreting...")
         self.width = image.width
         self.height = image.height
         x = 0
@@ -208,21 +206,21 @@ class BrainCopter():
             cell = image.rgb[y][x]
             code = (65536 * cell[0] + 256 * cell[1] + cell[2]) % 11
             if   code == 0:
-                self.data += '>'
+                self.commands.append('>')
             elif code == 1:
-                self.data += '<'
+                self.commands.append('<')
             elif code == 2:
-                self.data += '+'
+                self.commands.append('+')
             elif code == 3:
-                self.data += '-'
+                self.commands.append('-')
             elif code == 4:
-                self.data += '.'
+                self.commands.append('.')
             elif code == 5:
-                self.data += ','
+                self.commands.append(',')
             elif code == 6:
-                self.data += '['
+                self.commands.append('[')
             elif code == 7:
-                self.data += ']'
+                self.commands.append(']')
             elif code == 8:
                 direction = (direction + 1) % 4
             elif code == 9:
@@ -231,5 +229,5 @@ class BrainCopter():
             x, y = self.move(x, y, direction)
             if x == None:
                 break
-        print("Done")
+        self.data = ''.join(self.commands)
         self.program = BrainFuck(self.data)
