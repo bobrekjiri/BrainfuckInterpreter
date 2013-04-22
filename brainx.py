@@ -3,6 +3,7 @@
 
 import sys
 import image_png
+import re
 
 class BrainFuck:
     """Interpretr jazyka brainfuck."""
@@ -10,15 +11,20 @@ class BrainFuck:
     def getInput(self, data):
         tmp = data.split("!")
         if len(tmp) == 1:
-            return ""
-        return tmp[1]
+            return tmp[0], ''
+        return tmp[0], tmp[1]
 
-    def __init__(self, data, memory=b'\x00', memory_pointer=0):
+    def __init__(self, data, memory=b'\x00', memory_pointer=0, skipOptimalization=False):
         """Inicializace interpretru brainfucku."""
         stack = list()
         dataPointer = 0
-        self.data = data
-        inputData = self.getInput(data)
+        self.data, inputData = self.getInput(data)
+        if skipOptimalization == False:
+            print(len(self.data))
+            self.data = re.sub('[^\[\]\.,+-><]', '', self.data)
+            self.data = re.sub('[:/0-9]', '', self.data)
+            print(len(self.data))
+            print(self.data)
         inputPointer = 0
         dataLength = len(self.data)
 
@@ -165,7 +171,7 @@ class BrainLoller():
             if x == None:
                 break
         print(self.data)
-        self.program = BrainFuck(self.data)
+        self.program = BrainFuck(self.data, skipOptimalization = True)
 
 class BrainCopter():
     """Třída pro zpracování jazyka braincopter."""
@@ -230,4 +236,4 @@ class BrainCopter():
             if x == None:
                 break
         self.data = ''.join(self.commands)
-        self.program = BrainFuck(self.data)
+        self.program = BrainFuck(self.data, skipOptimalization = True)
