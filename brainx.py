@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import image_png
 import re
@@ -131,6 +132,11 @@ class BrainLoller():
 
     def __init__(self, filename):
         """Inicializace interpretru brainlolleru."""
+
+        if not os.path.exists(filename):
+            print("Soubor neexistuje")
+            return
+
         self.data = ''
         image = image_png.PngReader(filename)
         self.width = image.width
@@ -200,6 +206,10 @@ class BrainCopter():
 
     def __init__(self, filename):
         """Inicializace interpretru braincopteru."""
+
+        if not os.path.exists(filename):
+            print("Soubor neexistuje")
+            return
 
         self.commands = []
         image = image_png.PngReader(filename)
