@@ -137,7 +137,7 @@ class BrainLoller():
             print("Soubor neexistuje")
             return
 
-        self.data = ''
+        self.commands = []
         image = image_png.PngReader(filename)
         self.width = image.width
         self.height = image.height
@@ -148,35 +148,35 @@ class BrainLoller():
             cell = image.rgb[y][x]
             if   cell[0] == 255:
                 if   cell[1] == 255:
-                    self.data += '['
+                    self.commands.append('[')
                 elif cell[1] ==   0:
-                    self.data += '>'
+                    self.commands.append('>')
             elif cell[0] == 128:
                 if   cell[1] == 128:
-                    self.data += ']'
+                    self.commands.append(']')
                 elif cell[1] ==   0:
-                    self.data += '<'
+                    self.commands.append('<')
             elif cell[0] ==   0:
                 if   cell[1] == 255:
                     if   cell[2] == 255:
                         direction = (direction + 1) % 4
                     elif cell[2] ==   0:
-                        self.data += '+'
+                        self.commands.append('+')
                 elif cell[1] == 128:
                     if   cell[2] == 128:
                         direction = 3 if direction == 0 else direction - 1
                     elif cell[2] ==   0:
-                        self.data += '-'
+                        self.commands.append('-')
                 elif cell[1] ==   0:
                     if   cell[2] == 255:
-                        self.data += '.'
+                        self.commands.append('.')
                     elif cell[2] == 128:
-                        self.data += ','
+                        self.commands.append(',')
 
             x, y = self.move(x, y, direction)
             if x == None:
                 break
-        print(self.data)
+        self.data = ''.join(self.commands)
         self.program = BrainFuck(self.data, skipOptimalization = True)
 
 class BrainCopter():
